@@ -1,0 +1,30 @@
+{% include "blogapp/base.html"%}
+
+{%block content%}
+{% load static %}
+<link rel="stylesheet" href="{% static 'blogapp/css/login.css' %}">
+<div class='centre'>
+    <form method="POST" action='{% url "login"%}'>
+        {% csrf_token %}
+        {% for data in err%}
+                <div style="padding-left:85px;color:red">
+                    <p >{{data}}</p>
+                </div>
+            {% endfor %}
+        <ul>
+            <label>Username</label>
+            <input type='text' placeholder='username' class="box" name='username'>
+        </ul>
+        <ul>
+            <label>Password</label>
+            <input type='password' placeholder='password'class='box' name='password'>
+        </ul>
+        <ul>
+            <button type='submit' class='login'>LogIn</button>
+                <p style="margin-left:130px">Or</p>
+            <a  class='login' href='{% url "register"%}'>Register</a>
+        </ul>
+    </form>
+</div>
+
+{%endblock content%}

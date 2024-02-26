@@ -1,0 +1,132 @@
+{% include "blogapp/base.html" %} 
+
+
+{% block title %}
+<head>
+    <title>Home</title>
+</head>
+{% endblock title %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'blogapp/css/home.css' %}" >
+    
+</head>
+<body >
+    <div class="container">
+        <form method="POST" action='{% url "home"%}'>
+            {% csrf_token %}
+            <div id="div1css">
+                {{request.user.first_name}} {{request.user.last_name}}
+            
+            </div>
+            <p id="divusername">user:@{{request.user.username}}</p>
+            <h4 style="margin-left:150px;">Create Your Blog....</h4>
+            <div class='divcss'>
+               <label> Title:</label>
+               <input type='text' row='1' maxlength=100 name='title'><br>
+               <label>Description:</label><br>
+               <textarea class='description' row='100' column='1000' name='description'></textarea><br>
+                <!-- Input field for selecting a file -->
+                <label>Attach Files:</label><br>
+                <input type="file" id="imageInput" accept="image/*" name='image'><br>
+                <button type='submit' class='submit' >Post Blog</button>
+
+            </div> 
+
+            <!-- Display the selected image (optional) -->
+            <img id="selectedImage" style="max-width: 100px; max-heigth:100px;height: auto; display: none;" name='image2'>
+
+            <!-- JavaScript to handle file selection -->
+            <script>
+                // Get the input element and image element
+                const imageInput = document.getElementById('imageInput');
+                const selectedImage = document.getElementById('selectedImage');
+
+                // Add an event listener to the input element
+                imageInput.addEventListener('change', function () {
+                    // Check if a file is selected
+                    if (this.files && this.files[0]) {
+                        // Get the selected file
+                        const selectedFile = this.files[0];
+
+                        // Create a FileReader to read the file
+                        const reader = new FileReader();
+
+                        // Set the callback function when the file is loaded
+                        reader.onload = function (e) {
+                            // Set the source of the image element to the loaded file data
+                            selectedImage.src = e.target.result;
+
+                            // Display the image
+                            selectedImage.style.display = 'block';
+                        };
+
+                        // Read the file as a data URL
+                        reader.readAsDataURL(selectedFile);
+                    }
+                });
+            </script>
+        </form>
+        <div class='displaydiv'>
+            
+            
+            {% for i in data %}
+            <div class="blog-comment">
+                    <h5 style="margin-left:100px;margin-bottom:0px;color:rgb(118, 41, 41);margin-top:20px">{{i.username}}</h5>
+                    <p style="margin-left:100px;">({{i.created_at}})</p>
+                <div class="outputdiv">
+
+                    <h6 style="text-align:center">{{i.title}}</h6><br>
+                    <div style="margin-left:140px"><img src='{{i.image.url}}' style="max-width: 100px; max-heigth:100px;" ></div><br>
+                    {{i.description}}<br>
+
+                </div>
+                <form method="POST" action='{% url "commentpost" i.reference_id %}'>
+                    {% csrf_token %}
+                    <div class='commentdiv'>
+                        <label>Comment</label>
+                        <input type='text' name='blogcomment'>
+                        <button type='submit' class='submit' >Post</button>
+                    </div>
+                </form><br>
+                        <div >
+                            {% for j  in data1  %}
+                            <div class="usercomment">
+                                {% if j.comment_id == i.reference_id%}
+                                <div style="display:flex;">
+                                    <h6 style="margin-left:120px;">{{j.comment_by}}</h6>
+                                    <p>({{j.comment_time}})</p>
+                                    {% if j.comment_by == request.user.username %}
+                                    <div style="margin-left:150px;display:flex;">
+                                        <a href="{% url 'editcmt' j.id %}" class="submit" style="background-color:blue;text-decoration:none;">Edit</a>
+                                        <form method="POST" action='{% url "delete" j.id %}'>
+                                            {% csrf_token %}
+                                            <button type="submit" class="submit" style="background-color:red;">Delete</button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                    
+                                </div>
+                                <p style="margin-left:140px;color:blackblue;">{{j.cmt}}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                
+                
+            {% endfor %}
+            
+        </div>
+    </div>
+
+</body>
+</html>
+
+{% endblock content %}

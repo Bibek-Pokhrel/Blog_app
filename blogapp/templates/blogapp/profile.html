@@ -1,0 +1,65 @@
+{% include "blogapp/base.html"%}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'blogapp/css/profile.css' %}" >
+<link rel="stylesheet" href="{% static 'blogapp/css/home.css' %}" >
+<h4 style="margin-left:30px">Profile</h4>
+<div id="div1css">
+    {{request.user.first_name}} {{request.user.last_name}}
+
+</div>
+<div class='displaydiv'>
+            
+            
+    {% for i in data %}
+            <div class="blog-comment">
+                    <h5 style="margin-left:100px;margin-bottom:0px;color:rgb(118, 41, 41);margin-top:20px">{{i.username}}</h5>
+                    <p style="margin-left:100px;">({{i.created_at}})</p>
+                <div class="outputdiv">
+
+                    <h6 style="text-align:center">{{i.title}}</h6><br>
+                    <div style="margin-left:140px"><img src='{{i.image.url}}' style="max-width: 100px; max-heigth:100px;" ></div><br>
+                    {{i.description}}<br>
+
+                </div>
+                <form method="POST" action='{% url "commentpost" i.reference_id %}'>
+                    {% csrf_token %}
+                    <div class='commentdiv'>
+                        <label>Comment</label>
+                        <input type='text' name='blogcomment'>
+                        <button type='submit' class='submit' >Post</button>
+                    </div>
+                </form><br>
+                        <div >
+                            {% for j  in data1  %}
+                            <div class="usercomment">
+                                {% if j.comment_id == i.reference_id%}
+                                <div style="display:flex;">
+                                    <h6 style="margin-left:120px;">{{j.comment_by}}</h6>
+                                    <p>({{j.comment_time}})</p>
+                                    
+                                    <div style="margin-left:750px;display:flex;">
+                                        {% if j.comment_by == request.user.username %}
+                                            <a href="{% url 'editcmt' j.id %}" class="submit" style="background-color:blue;text-decoration:none;">Edit</a>
+                                        {% endif %}
+                                        <form method="POST" action='{% url "delete" j.id %}'>
+                                            {% csrf_token %}
+                                            <button type="submit" class="submit" style="background-color:red;">Delete</button>
+                                        </form>
+                                    </div>
+                                    
+                                    
+                                    
+                                </div>
+                                <p style="margin-left:140px;color:blackblue;">{{j.cmt}}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                
+                
+            {% endfor %}
+</div>
+{% endblock content %}
